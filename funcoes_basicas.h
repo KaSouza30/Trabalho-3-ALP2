@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <string.h>
+#define TC 100
 
 void limpar_enter(char vetor[])
 {
@@ -41,3 +42,9 @@ float ler_float(char mensagem[])
     return valor;
 }
 
+char ler_string(char mensagem[], char vetor[])
+{
+    printf("%s", mensagem);
+    fgets(vetor, TC, stdin);
+    limpar_enter(vetor);
+}
