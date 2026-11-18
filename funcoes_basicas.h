@@ -1,27 +1,5 @@
 #include <stdio.h>
-#define T 100
-#define TC 7
-
-struct Veiculo
-{
-    int codigo;
-    char placa[TC];
-    char modelo[T];
-    int ano;
-    float km;
-    char sit;
-};
-
-struct Abastecimento
-{
-    int dia;
-    int mes;
-    int ano;
-    int veiculo;
-    float litros;
-    float valor;
-    float km_abastecimento;
-};
+#include <string.h>
 
 void limpar_enter(char vetor[])
 {
@@ -47,3 +25,19 @@ int ler_int(char mensagem[])
     } while (valor < 0);
     return valor;
 }
+
+float ler_float(char mensagem[])
+{
+    float valor;
+    do
+    {
+        printf("%s", mensagem);
+        scanf("%f", &valor);
+        if (valor < 0)
+        {
+            printf("Valor invalido! Digite novamente.\n");
+        }
+    } while (valor < 0);
+    return valor;
+}
+
