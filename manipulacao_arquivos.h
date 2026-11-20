@@ -187,4 +187,32 @@ void alterar_todos(Veiculo veiculo[], int pos)
     veiculo[pos].ano = ler_int("Digite o ano: ");
 }
 
+int sobreescrever_veiculo(int posicao, Veiculo veiculo)
+{
+    FILE *arq;
+    int sucesso = 0;
+    arq = fopen("veiculos.dat", "rb+");
+    if (arq == NULL)
+    {
+        printf("Nao foi possivel abrir o arquivo.\n");
+    }
+    else
+    {
+        if (fseek(arq, posicao * sizeof(Veiculo), SEEK_SET) != 0)
+        {
+            printf("Erro ao localizar o veiculo no arquivo.\n");
+        }
+        else if (fwrite(&veiculo, sizeof(Veiculo), 1, arq) != 1)
+        {
+            printf("Erro ao alterar o veiculo.\n");
+        }
+        else
+        {
+            sucesso = 1;
+        }
+        fclose(arq);
+    }
+    return sucesso;
+}
+
 #endif
