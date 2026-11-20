@@ -51,57 +51,6 @@ int localizar_placa(char placa[], int codigo_ignorar)
     return pos;
 }
 
-void ler_placa(char placa[], int tamanho, int pos_ignorar)
-{
-    int valido, i, j = 0, pos_placa;
-    do
-    {
-        valido = 1;
-        ler_string("Digite a placa: ", placa, tamanho);
-        j = 0;
-        while (placa[j] != '\0')
-        {
-            placa[j] = toupper(placa[j]);
-            j++;
-        }
-        if (strlen(placa) != 7)
-        {
-            valido = 0;
-        }
-        else
-        {
-            for (i = 0; i < tamanho; i++)
-            {
-                if (i == 0 || i == 1 || i == 2 || i == 4)
-                {
-                    if (placa[i] < 'A' || placa[i] > 'Z')
-                    {
-                        valido = 0;
-                    }
-                }
-                else
-                {
-                    if (placa[i] < '0' || placa[i] > '9')
-                    {
-                        valido = 0;
-                    }
-                }
-            }
-            pos_placa = localizar_placa(placa, pos_ignorar);
-            if (pos_placa != -1)
-            {
-                valido = 0;
-                printf("Placa ja cadastrada!\n");
-            }
-        }
-
-        if (!valido)
-        {
-            printf("Placa invalida!\n");
-        }
-    } while (!valido);
-}
-
 int buscar_veiculo(int posicao, Veiculo *veiculo)
 {
     FILE *arq;
