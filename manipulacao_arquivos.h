@@ -54,14 +54,16 @@ int localizar_placa(char placa[], int codigo_ignorar)
 
 void ler_placa(char placa[], int tamanho, int pos_ignorar)
 {
-    int valido, i, j, pos_placa;
+    int valido, i, j = 0, pos_placa;
     do
     {
         valido = 1;
         ler_string("Digite a placa: ", placa, tamanho);
-        for (j = 0; placa[j] != '\0'; j++)
+        j = 0;
+        while (placa[j] != '\0')
         {
             placa[j] = toupper(placa[j]);
+            j++;
         }
         if (strlen(placa) != 7)
         {
@@ -101,6 +103,30 @@ void ler_placa(char placa[], int tamanho, int pos_ignorar)
     } while (!valido);
 }
 
+int buscar_veiculo(int posicao, Veiculo *veiculo)
+{
+    FILE *arq;
+    int sucesso = 0;
+
+    arq = fopen("veiculos.dat", "rb");
+
+    if (arq != NULL)
+    {
+        if (fseek(arq, posicao * sizeof(Veiculo), SEEK_SET) == 0)
+        {
+            if (fread(veiculo, sizeof(Veiculo), 1, arq) == 1)
+            {
+                sucesso = 1;
+            }
+        }
+
+        fclose(arq);
+    }
+
+    return sucesso;
+}
+
+// exercicio 1
 int cadastrar_veiculo(Veiculo veiculo, int total)
 {
     int codigo, pos_veiculo;
@@ -166,6 +192,7 @@ int incluir_veiculo(Veiculo veiculo)
     return sucesso;
 }
 
+// exercicio 2
 void alterar_placa(Veiculo veiculo[], int pos)
 {
     ler_placa(veiculo[pos].placa, 7, veiculo[pos].codigo);
@@ -206,6 +233,129 @@ int sobreescrever_veiculo(int posicao, Veiculo veiculo)
         else if (fwrite(&veiculo, sizeof(Veiculo), 1, arq) != 1)
         {
             printf("Erro ao alterar o veiculo.\n");
+        }
+        else
+        {
+            sucesso = 1;
+        }
+        fclose(arq);
+    }
+    return sucesso;
+}
+
+// exercicio 3
+int cadastrar_abastecimento(Abastecimento abastecimento, Veiculo veiculo, int total, int total_abastecimento)
+{
+    int dia, mes, ano, codigo, pos;
+    float quilometragem;
+
+    if (total > 0)
+    {
+        if (total_abastecimento < TA)
+        {
+            do
+            {
+                dia = ler_int("Digite o dia da venda: ");
+                if (dia <= 0 || dia > 31)
+                {
+                    printf("Dia invalido!\n");
+                }
+            } while (dia <= 0 || dia > 31);
+            do
+            {
+                mes = ler_int("Digite o mes da venda: ");
+                if (mes <= 0 || mes > 12)
+                {
+                    printf("Mes invalido!\n");
+                }
+                if (mes == 2)
+                {
+                    if (dia > 28)
+                    {
+                        while (dia > 28 || dia < 1)
+                        {
+                            printf("Dia invalido!\n");
+                            dia = ler_int("Digite o dia da venda: ");
+                        }
+                    }
+                }
+            } while (mes <= 0 || mes > 12);
+            do
+            {
+                ano = ler_int("Digite o ano da venda: ");
+                if (ano <= 1999 || ano > 2026)
+                {
+                    printf("Ano invalido!\n");
+                }
+            } while (ano <= 1999 || ano > 2026);
+            do
+            {
+                codigo = ler_int("Digite um codigo: ");
+                pos = localizar_veiculo(codigo);
+
+                if (pos == -1)
+                {
+                    printf("Codigo nao encontrado!\n");
+                }
+                else
+                {
+                    buscar_veiculo(pos, &veiculo);
+                    if (veiculo.situacao == 0)
+                    {
+                        printf("Veiculo inativo!\n");
+                    }
+                }
+            } while (pos == -1 || veiculo.situacao == 0);
+
+            do
+            {
+                quilometragem = ler_float("Digite a quilometragem: ");
+                if (quilometragem <= veiculo.km_atual)
+                {
+                    printf("Valor da quilometragem invalido!\n");
+                }
+            } while (quilometragem <= veiculo.km_atual);
+            abastecimento.ano = ano;
+            abastecimento.dia = dia;
+            abastecimento.mes = mes;
+            veiculo.km_atual = quilometragem;
+            sobreescrever_veiculo(pos, veiculo);
+            abastecimento.veiculo_codigo = codigo;
+            abastecimento.litros = ler_float("Digite a quantidade de litros: ");
+            abastecimento.valor = ler_float("Digite o valor do litro: ");
+
+            if (incluir_abastecimento(abastecimento))
+            {
+                total_abastecimento ++;
+            }
+        }
+        else
+        {
+            printf("Maximo de abastecimentos feitos!\n");
+        }
+    }
+    else
+    {
+        printf("Nenhum veiculo cadastrado!\n");
+    }
+    return total_abastecimento;
+}
+
+int incluir_abastecimento(Abastecimento abastecimento)
+{
+    FILE *arq;
+    int sucesso = 0;
+
+    arq = fopen("veiculos.dat", "ab");
+    if (arq == NULL)
+    {
+        printf("Nao foi possivel abrir o arquivo para gravacao!\n");
+    }
+    else
+    {
+        if (fwrite(&abastecimento, sizeof(Abastecimento), 1, arq) != 1)
+        {
+            printf("Erro ao gravar o veiculo!\n");
         }
         else
         {
