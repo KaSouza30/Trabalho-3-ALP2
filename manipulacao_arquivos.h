@@ -58,6 +58,7 @@ void ler_placa(char placa[], int tamanho, int pos_ignorar)
     {
         valido = 1;
         ler_string("Digite a placa: ", placa, tamanho);
+        j = 0;
         while (placa[j] != '\0')
         {
             placa[j] = toupper(placa[j]);
@@ -99,6 +100,29 @@ void ler_placa(char placa[], int tamanho, int pos_ignorar)
             printf("Placa invalida!\n");
         }
     } while (!valido);
+}
+
+int buscar_veiculo(int posicao, Veiculo *veiculo)
+{
+    FILE *arq;
+    int sucesso = 0;
+
+    arq = fopen("veiculos.dat", "rb");
+
+    if (arq != NULL)
+    {
+        if (fseek(arq, posicao * sizeof(Veiculo), SEEK_SET) == 0)
+        {
+            if (fread(veiculo, sizeof(Veiculo), 1, arq) == 1)
+            {
+                sucesso = 1;
+            }
+        }
+
+        fclose(arq);
+    }
+
+    return sucesso;
 }
 
 // exercicio 1
@@ -272,9 +296,13 @@ void cadastrar_abastecimento(Abastecimento abastecimento, Veiculo veiculo, int t
                 {
                     printf("Codigo nao encontrado!\n");
                 }
-                if (veiculo.situacao == 0)
+                else
                 {
-                    printf("Veiculo inativo!\n");
+                    buscar_veiculo(pos, &veiculo);
+                    if (veiculo.situacao == 0)
+                    {
+                        printf("Veiculo inativo!\n");
+                    }
                 }
             } while (pos == -1 || veiculo.situacao == 0);
 
@@ -305,6 +333,31 @@ void cadastrar_abastecimento(Abastecimento abastecimento, Veiculo veiculo, int t
     {
         printf("Nenhum veiculo cadastrado!\n");
     }
+}
+
+int incluir_abastecimento(Abastecimento abastecimento)
+{
+    FILE *arq;
+    int sucesso = 0;
+
+    arq = fopen("veiculos.dat", "ab");
+    if (arq == NULL)
+    {
+        printf("Nao foi possivel abrir o arquivo para gravacao!\n");
+    }
+    else
+    {
+        if (fwrite(&abastecimento, sizeof(Abastecimento), 1, arq) != 1)
+        {
+            printf("Erro ao gravar o veiculo!\n");
+        }
+        else
+        {
+            sucesso = 1;
+        }
+        fclose(arq);
+    }
+    return sucesso;
 }
 
 #endif
