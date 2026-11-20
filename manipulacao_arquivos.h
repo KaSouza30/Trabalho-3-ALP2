@@ -1,3 +1,4 @@
+// Dupla: Gustavo Nobre, Kaua Souza Rocha
 #ifndef MANIPULACAO_ARQUIVOS_H
 #define MANIPULACAO_ARQUIVOS_H
 #include "funcoes_basicas.h"

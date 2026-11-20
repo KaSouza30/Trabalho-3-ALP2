@@ -1,3 +1,4 @@
+// Dupla: Gustavo Nobre, Kaua Souza Rocha
 #ifndef FUNCOES_BASICAS_H
 #define FUNCOES_BASICAS_H
 #include <stdio.h>
