@@ -5,6 +5,7 @@
 #define TC 100
 #define T 8
 #define TV 100
+#define TA 1000
 
 struct Veiculo
 {
