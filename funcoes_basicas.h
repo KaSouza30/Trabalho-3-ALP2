@@ -1,32 +1,29 @@
+#ifndef FUNCOES_BASICAS_H
+#define FUNCOES_BASICAS_H
 #include <stdio.h>
 #include <string.h>
 #define TC 100
-#define T 7
+#define T 8
+#define TV 100
 
-typedef struct {
-    int codigo;
-    char placa[T];
-    char modelo[TC];
-    int ano;
+struct Veiculo
+{
+    int codigo, ano;
+    char placa[T], modelo[TC], situacao;
     float km_atual;
-    char situacao;
-} Veiculo;
+};
 
-typedef struct {
-    int dia;
-    int mes;
-    int ano;
-    int veiculo_codigo;
-    float litros;
-    float valor;
-    float km_abastecimento;
-} Abastecimento;
+struct Abastecimento
+{
+    int dia, mes, ano, veiculo_codigo;
+    float litros, valor, km_abastecimento;
+};
 
 void limpar_enter(char vetor[])
 {
     int tl;
     tl = strlen(vetor);
-    if (vetor[tl - 1] == '\n')
+    if (tl > 0 && vetor[tl - 1] == '\n')
     {
         vetor[tl - 1] = '\0';
     }
@@ -62,9 +59,12 @@ float ler_float(char mensagem[])
     return valor;
 }
 
-char ler_string(char mensagem[], char vetor[])
+void ler_string(char mensagem[], char vetor[], int tamanho)
 {
+    getchar();
     printf("%s", mensagem);
-    fgets(vetor, TC, stdin);
+    fgets(vetor, tamanho, stdin);
     limpar_enter(vetor);
 }
+
+#endif
