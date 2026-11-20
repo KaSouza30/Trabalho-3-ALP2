@@ -1,6 +1,26 @@
 #include <stdio.h>
 #include <string.h>
 #define TC 100
+#define T 7
+
+typedef struct {
+    int codigo;
+    char placa[T];
+    char modelo[TC];
+    int ano;
+    float km_atual;
+    char situacao;
+} Veiculo;
+
+typedef struct {
+    int dia;
+    int mes;
+    int ano;
+    int veiculo_codigo;
+    float litros;
+    float valor;
+    float km_abastecimento;
+} Abastecimento;
 
 void limpar_enter(char vetor[])
 {
