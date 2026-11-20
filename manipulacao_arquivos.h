@@ -243,14 +243,14 @@ int sobreescrever_veiculo(int posicao, Veiculo veiculo)
 }
 
 // exercicio 3
-void cadastrar_abastecimento(Abastecimento abastecimento, Veiculo veiculo, int total, int *total_abastecimento)
+int cadastrar_abastecimento(Abastecimento abastecimento, Veiculo veiculo, int total, int total_abastecimento)
 {
     int dia, mes, ano, codigo, pos;
     float quilometragem;
 
     if (total > 0)
     {
-        if (*total_abastecimento < TA)
+        if (total_abastecimento < TA)
         {
             do
             {
@@ -322,7 +322,11 @@ void cadastrar_abastecimento(Abastecimento abastecimento, Veiculo veiculo, int t
             abastecimento.veiculo_codigo = codigo;
             abastecimento.litros = ler_float("Digite a quantidade de litros: ");
             abastecimento.valor = ler_float("Digite o valor do litro: ");
-            *total_abastecimento += 1;
+
+            if (incluir_abastecimento(abastecimento))
+            {
+                total_abastecimento ++;
+            }
         }
         else
         {
@@ -333,6 +337,7 @@ void cadastrar_abastecimento(Abastecimento abastecimento, Veiculo veiculo, int t
     {
         printf("Nenhum veiculo cadastrado!\n");
     }
+    return total_abastecimento;
 }
 
 int incluir_abastecimento(Abastecimento abastecimento)
