@@ -377,7 +377,7 @@ float calcular_litros(Abastecimento abastecimento[], int total_abastecimento, in
     }
     return quantidade_litros;
 }
-
+//
 float calcular_consumo_medio(Abastecimento abastecimento[], int total_abastecimento)
 {
     int codigo, pos, contador;
