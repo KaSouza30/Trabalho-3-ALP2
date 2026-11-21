@@ -121,4 +121,21 @@ void ler_placa(char placa[], int tamanho, int pos_ignorar)
     } while (!valido);
 }
 
+void apresentar_dados_veiculo (Veiculo veiculo) 
+{
+    printf("Codigo: %d\n", veiculo.codigo);
+    printf("Placa: %s\n", veiculo.placa);
+    printf("Modelo: %s\n", veiculo.modelo);
+    printf("Ano: %d\n", veiculo.ano);
+    printf("Km atual: %.2f\n", veiculo.km_atual);
+    if (veiculo.situacao == 1)
+    {
+        printf("Situacao: Ativo\n");
+    }
+    else
+    {
+        printf("Situacao: Inativo\n");
+    }
+}
+
 #endif
