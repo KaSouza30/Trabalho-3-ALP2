@@ -169,8 +169,9 @@ Veiculo pesquisar_veiculo_por_codigo(int codigo)
     return veiculo;
 }
 
-// exercicio 4 - verificar_tem_abastecimentos(), excluir_veiculo_logica(), recuperar_veiculo()
-int verificar_tem_abastecimento(int codigo) 
+/* exercicio 4 - verificar_tem_abastecimentos(), excluir_veiculo_logica(), recuperar_veiculo(),
+copiar_registros_veiculos_exceto(), substituir_arquivo(), excluir_veiculos_fisica() */
+int verificar_tem_abastecimento(int codigo)
 // passa por todos os registros ate achar um que tenha o codigo fornecido, se tiver retorna 1
 {
     FILE *arq;
@@ -253,7 +254,7 @@ void recuperar_veiculo(int posicao)
 }
 
 int copiar_registros_veiculos_exceto()
-// copia todos os registros de veiculo exceto os com situacao = 0
+// copia todos os registros de veiculo para o arquivo temporario, exceto os com situacao = 0
 {
     FILE *arq_orig, *arq_dest;
     Veiculo veiculo;
@@ -325,6 +326,27 @@ void excluir_veiculos_fisica()
         printf("Erro ao criar o arquivo temporario.\n");
         remove("veiculos_temporario.dat");
     }
+}
+
+// exercicio 5 - outra parte esta em menu.h, linha 67 
+Veiculo retornar_veiculo_por_posicao(int posicao)
+{
+    FILE *arq;
+    Veiculo veiculo = {0};
+    arq = fopen("veiculos.dat", "rb");
+
+    if (arq == NULL)
+    {
+        printf("Nao foi possivel abrir o arquivo de veiculos.\n");
+    }
+    else
+    {
+        fseek(arq, posicao * sizeof(Veiculo), SEEK_SET);
+        fread(&veiculo, sizeof(Veiculo), 1, arq);
+        fclose(arq);
+    }
+
+    return veiculo;
 }
 
 // exercicio 8
