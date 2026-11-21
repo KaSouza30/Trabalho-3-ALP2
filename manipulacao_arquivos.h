@@ -86,6 +86,31 @@ int incluir_veiculo(Veiculo veiculo)
     return sucesso;
 }
 
+int incluir_abastecimento(Abastecimento abastecimento)
+{
+    FILE *arq;
+    int sucesso = 0;
+
+    arq = fopen("abastecimentos.dat", "ab");
+    if (arq == NULL)
+    {
+        printf("Nao foi possivel abrir o arquivo para gravacao!\n");
+    }
+    else
+    {
+        if (fwrite(&abastecimento, sizeof(Abastecimento), 1, arq) != 1)
+        {
+            printf("Erro ao gravar o veiculo!\n");
+        }
+        else
+        {
+            sucesso = 1;
+        }
+        fclose(arq);
+    }
+    return sucesso;
+}
+
 int sobreescrever_veiculo(int posicao, Veiculo veiculo)
 {
     FILE *arq;
@@ -114,8 +139,8 @@ int sobreescrever_veiculo(int posicao, Veiculo veiculo)
     return sucesso;
 }
 
-// exercicio 3
-Veiculo pesquisar_veiculo_por_codigo (int codigo)
+// exercicio 3 - pesquisar_veiculo_por_codigo()
+Veiculo pesquisar_veiculo_por_codigo(int codigo)
 {
     FILE *arq;
     Veiculo veiculo = {0};
@@ -125,17 +150,18 @@ Veiculo pesquisar_veiculo_por_codigo (int codigo)
     posicao = localizar_veiculo(codigo);
     if (arq == NULL)
     {
-        printf("Nao foi possivel abrir o arquivo.\n");
-    } else 
+        printf("Nao foi possivel abrir o arquivo de veiculos.\n");
+    }
+    else
     {
         if (posicao == -1)
         {
             printf("Veiculo nao encontrado!\n");
-        } 
-        else 
+        }
+        else
         {
-            fseek(arq, posicao * sizeof(veiculo), SEEK_SET);
-            fread(&veiculo, sizeof(veiculo), 1, arq);
+            fseek(arq, posicao * sizeof(Veiculo), SEEK_SET);
+            fread(&veiculo, sizeof(Veiculo), 1, arq);
             fclose(arq);
         }
     }
@@ -143,29 +169,162 @@ Veiculo pesquisar_veiculo_por_codigo (int codigo)
     return veiculo;
 }
 
-int incluir_abastecimento(Abastecimento abastecimento)
+// exercicio 4 - verificar_tem_abastecimentos(), excluir_veiculo_logica(), recuperar_veiculo()
+int verificar_tem_abastecimento(int codigo) 
+// passa por todos os registros ate achar um que tenha o codigo fornecido, se tiver retorna 1
 {
     FILE *arq;
-    int sucesso = 0;
+    Abastecimento abastecimento = {0};
+    int tem_abastecimento = 0;
+    arq = fopen("abastecimentos.dat", "rb");
 
-    arq = fopen("abastecimentos.dat", "ab");
     if (arq == NULL)
     {
-        printf("Nao foi possivel abrir o arquivo para gravacao!\n");
+        printf("Nao foi possivel abrir o arquivo de abastecimentos.");
     }
     else
     {
-        if (fwrite(&abastecimento, sizeof(Abastecimento), 1, arq) != 1)
+        while (fread(&abastecimento, sizeof(Abastecimento), 1, arq) == 1 && tem_abastecimento == 0)
         {
-            printf("Erro ao gravar o veiculo!\n");
+            if (abastecimento.veiculo_codigo == codigo)
+            {
+                tem_abastecimento = 1;
+            }
+        }
+    }
+
+    return tem_abastecimento;
+}
+
+void excluir_veiculo_logica(int posicao)
+{
+    Veiculo veiculo;
+    veiculo = pesquisar_veiculo_por_codigo(posicao);
+    int sobreescreveu = 0, tem_abastecimento;
+    if (veiculo.situacao == 1)
+    {
+        tem_abastecimento = verificar_tem_abastecimento(veiculo.codigo);
+        if (tem_abastecimento == 0)
+        {
+            veiculo.situacao = 0;
+            sobreescreveu = sobreescrever_veiculo(posicao, veiculo);
+            if (sobreescreveu == 1)
+            {
+                printf("Veiculo excluido logicamente.\n");
+            }
+            else
+            {
+                printf("Falha ao excluir o veiculo.\n");
+            }
         }
         else
         {
-            sucesso = 1;
+            printf("Veiculos com abastecimentos registrados nao podem ser excluidos.\n");
         }
-        fclose(arq);
     }
-    return sucesso;
+    else
+    {
+        printf("Veiculo ja excluido logicamente.\n");
+    }
+}
+
+void recuperar_veiculo(int posicao)
+{
+    Veiculo veiculo;
+    veiculo = pesquisar_veiculo_por_codigo(posicao);
+    int sobreescreveu = 0;
+    if (veiculo.situacao == 0)
+    {
+        veiculo.situacao = 1;
+        sobreescreveu = sobreescrever_veiculo(posicao, veiculo);
+        if (sobreescreveu == 1)
+        {
+            printf("Veiculo recuperado.\n");
+        }
+        else
+        {
+            printf("Falha ao recuperar o veiculo.\n");
+        }
+    }
+    else
+    {
+        printf("Veiculo ja ativo.\n");
+    }
+}
+
+int copiar_registros_veiculos_exceto()
+// copia todos os registros de veiculo exceto os com situacao = 0
+{
+    FILE *arq_orig, *arq_dest;
+    Veiculo veiculo;
+    int resultado = 1;
+    arq_orig = fopen("veiculos.dat", "rb");
+    if (arq_orig == NULL)
+    {
+        resultado = 0;
+    }
+    else
+    {
+        arq_dest = fopen("veiculos_temporario.dat", "wb");
+        if (arq_dest == NULL)
+        {
+            resultado = 0;
+        }
+        else
+        {
+            while (fread(&veiculo, sizeof(Veiculo), 1, arq_orig) == 1)
+            {
+                if (veiculo.situacao == 1)
+                {
+                    fwrite(&veiculo, sizeof(Veiculo), 1, arq_dest);
+                }
+            }
+            fclose(arq_dest);
+        }
+        fclose(arq_orig);
+    }
+
+    return resultado;
+}
+
+int substituir_arquivo()
+{
+    int resultado = 1;
+    if (remove("veiculos.dat") != 0)
+    {
+        resultado = 0;
+    }
+    else
+    {
+        if (rename("veiculos_temporario.dat", "veiculos.dat") != 0)
+        {
+            resultado = 0;
+        }
+    }
+    return resultado;
+}
+
+void excluir_veiculos_fisica()
+{
+    int resultado;
+    resultado = copiar_registros_veiculos_exceto();
+    if (resultado == 1)
+    {
+        resultado = substituir_arquivo();
+        if (resultado == 1)
+        {
+            printf("Veiculos excluidos fisicamente.\n");
+        }
+        else
+        {
+            printf("Erro ao substituir o arquivo original.\n");
+        }
+    }
+    else
+    {
+        printf("Erro ao criar o arquivo temporario.\n");
+        remove("veiculos_temporario.dat");
+    }
 }
 
 // exercicio 8
@@ -250,7 +409,7 @@ float calcular_consumo_medio(Abastecimento abastecimento[], int total_abastecime
             {
                 quantidade_litros = calcular_litros(abastecimento, total_abastecimento, codigo);
                 diferenca = maior - menor;
-                if(quantidade_litros < 0)
+                if (quantidade_litros < 0)
                 {
                     printf("Nao e possivel calcular o consumo! Quantidade de litros incorreto.\n");
                 }
