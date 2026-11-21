@@ -52,29 +52,6 @@ int localizar_placa(char placa[], int codigo_ignorar)
     return pos;
 }
 
-int buscar_veiculo(int posicao, Veiculo *veiculo)
-{
-    FILE *arq;
-    int sucesso = 0;
-
-    arq = fopen("veiculos.dat", "rb");
-
-    if (arq != NULL)
-    {
-        if (fseek(arq, posicao * sizeof(Veiculo), SEEK_SET) == 0)
-        {
-            if (fread(veiculo, sizeof(Veiculo), 1, arq) == 1)
-            {
-                sucesso = 1;
-            }
-        }
-
-        fclose(arq);
-    }
-
-    return sucesso;
-}
-
 int incluir_veiculo(Veiculo veiculo)
 {
     FILE *arq;

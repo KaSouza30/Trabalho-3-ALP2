@@ -6,57 +6,7 @@ Gustavo: exercicios 3, 4, 5, 7, 9 e 12*/
 #define MENU_H
 
 #include "manipulacao_arquivos.h"
-
-void ler_placa(char placa[], int tamanho, int pos_ignorar)
-{
-    int valido, i, j = 0, pos_placa;
-    do
-    {
-        valido = 1;
-        ler_string("Digite a placa: ", placa, tamanho);
-        j = 0;
-        while (placa[j] != '\0')
-        {
-            placa[j] = toupper(placa[j]);
-            j++;
-        }
-        if (strlen(placa) != 7)
-        {
-            valido = 0;
-        }
-        else
-        {
-            for (i = 0; i < tamanho; i++)
-            {
-                if (i == 0 || i == 1 || i == 2 || i == 4)
-                {
-                    if (placa[i] < 'A' || placa[i] > 'Z')
-                    {
-                        valido = 0;
-                    }
-                }
-                else
-                {
-                    if (placa[i] < '0' || placa[i] > '9')
-                    {
-                        valido = 0;
-                    }
-                }
-            }
-            pos_placa = localizar_placa(placa, pos_ignorar);
-            if (pos_placa != -1)
-            {
-                valido = 0;
-                printf("Placa ja cadastrada!\n");
-            }
-        }
-
-        if (!valido)
-        {
-            printf("Placa invalida!\n");
-        }
-    } while (!valido);
-}
+#include "funcoes_basicas.h"
 
 // exercicio 1
 int cadastrar_veiculo(Veiculo veiculo, int total)
@@ -153,7 +103,7 @@ void validar_data(int *dia, int *mes, int *ano)
     } while (*ano <= 1999 || *ano > 2026);
 }
 
-int cadastrar_abastecimento(Abastecimento abastecimento, Veiculo veiculo, int total, int total_abastecimento)
+int cadastrar_abastecimento(Abastecimento abastecimento[], Veiculo veiculo[], int total, int total_abastecimento)
 {
     int dia, mes, ano, codigo, pos;
     float quilometragem;
@@ -174,33 +124,32 @@ int cadastrar_abastecimento(Abastecimento abastecimento, Veiculo veiculo, int to
                 }
                 else
                 {
-                    buscar_veiculo(pos, &veiculo);
-                    if (veiculo.situacao == 0)
+                    if (veiculo[pos].situacao == 0)
                     {
                         printf("Veiculo inativo!\n");
                     }
                 }
-            } while (pos == -1 || veiculo.situacao == 0);
+            } while (pos == -1 || veiculo[pos].situacao == 0);
 
             do
             {
                 quilometragem = ler_float("Digite a quilometragem: ");
-                if (quilometragem <= veiculo.km_atual)
+                if (quilometragem <= veiculo[pos].km_atual)
                 {
                     printf("Valor da quilometragem invalido!\n");
                 }
-            } while (quilometragem <= veiculo.km_atual);
-            abastecimento.ano = ano;
-            abastecimento.dia = dia;
-            abastecimento.mes = mes;
-            veiculo.km_atual = quilometragem;
-            sobreescrever_veiculo(pos, veiculo);
-            abastecimento.veiculo_codigo = codigo;
-            abastecimento.litros = ler_float("Digite a quantidade de litros: ");
-            abastecimento.valor = ler_float("Digite o valor do litro: ");
+            } while (quilometragem <= veiculo[pos].km_atual);
+            abastecimento[total_abastecimento].ano = ano;
+            abastecimento[total_abastecimento].dia = dia;
+            abastecimento[total_abastecimento].mes = mes;
+            abastecimento[total_abastecimento].veiculo_codigo = codigo;
+            abastecimento[total_abastecimento].litros = ler_float("Digite a quantidade de litros: ");
+            abastecimento[total_abastecimento].valor = ler_float("Digite o valor do litro: ");
 
-            if (incluir_abastecimento(abastecimento))
+            if (incluir_abastecimento(abastecimento[total_abastecimento]))
             {
+                veiculo[pos].km_atual = quilometragem;
+                sobreescrever_veiculo(pos, veiculo[pos]);
                 total_abastecimento++;
             }
         }
