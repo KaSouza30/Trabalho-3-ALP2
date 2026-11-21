@@ -191,9 +191,10 @@ int sobreescrever_veiculo(int posicao, Veiculo veiculo)
     return sucesso;
 }
 
-// exercicio 3
-int cadastrar_abastecimento(Abastecimento abastecimento, Veiculo veiculo, int total, int total_abastecimento)
+// exercicio 6
+int cadastrar_abastecimento(Abastecimento abastecimento[], Veiculo veiculo[], int total, int total_abastecimento)
 {
+    // não terminado
     int dia, mes, ano, codigo, pos;
     float quilometragem;
 
@@ -247,34 +248,34 @@ int cadastrar_abastecimento(Abastecimento abastecimento, Veiculo veiculo, int to
                 }
                 else
                 {
-                    buscar_veiculo(pos, &veiculo);
-                    if (veiculo.situacao == 0)
+                    if (veiculo[pos].situacao == 0)
                     {
                         printf("Veiculo inativo!\n");
                     }
                 }
-            } while (pos == -1 || veiculo.situacao == 0);
+            } while (pos == -1 || veiculo[pos].situacao == 0);
 
             do
             {
                 quilometragem = ler_float("Digite a quilometragem: ");
-                if (quilometragem <= veiculo.km_atual)
+                if (quilometragem <= veiculo[pos].km_atual)
                 {
                     printf("Valor da quilometragem invalido!\n");
                 }
-            } while (quilometragem <= veiculo.km_atual);
-            abastecimento.ano = ano;
-            abastecimento.dia = dia;
-            abastecimento.mes = mes;
-            veiculo.km_atual = quilometragem;
-            sobreescrever_veiculo(pos, veiculo);
-            abastecimento.veiculo_codigo = codigo;
-            abastecimento.litros = ler_float("Digite a quantidade de litros: ");
-            abastecimento.valor = ler_float("Digite o valor do litro: ");
+            } while (quilometragem <= veiculo[pos].km_atual);
+            abastecimento[total_abastecimento].ano = ano;
+            abastecimento[total_abastecimento].dia = dia;
+            abastecimento[total_abastecimento].mes = mes;
+            abastecimento[total_abastecimento].km_abastecimento = quilometragem;
+            abastecimento[total_abastecimento].veiculo_codigo = codigo;
+            abastecimento[total_abastecimento].litros = ler_float("Digite a quantidade de litros: ");
+            abastecimento[total_abastecimento].valor = ler_float("Digite o valor do litro: ");
 
-            if (incluir_abastecimento(abastecimento))
+            if (incluir_abastecimento(abastecimento[total_abastecimento]))
             {
-                total_abastecimento ++;
+                veiculo[pos].km_atual = quilometragem;
+                sobreescrever_veiculo(pos, veiculo[pos]);
+                total_abastecimento++;
             }
         }
         else
@@ -312,6 +313,103 @@ int incluir_abastecimento(Abastecimento abastecimento)
         fclose(arq);
     }
     return sucesso;
+}
+
+// exercicio 8
+void encontrar_maior_menor(Abastecimento abastecimento[], int total_abastecimento,
+                           float *maior, float *menor, int *contador, int codigo)
+{
+    int i;
+    *maior = 0;
+    *menor = -1;
+    *contador = 0;
+
+    if (total_abastecimento > 0)
+    {
+        for (i = 0; i < total_abastecimento; i++)
+        {
+            if (abastecimento[i].veiculo_codigo == codigo)
+            {
+                if (abastecimento[i].km_abastecimento > *maior)
+                {
+                    *maior = abastecimento[i].km_abastecimento;
+                }
+                if (abastecimento[i].km_abastecimento < *menor || *menor == -1)
+                {
+                    *menor = abastecimento[i].km_abastecimento;
+                }
+                (*contador)++;
+            }
+        }
+    }
+    else
+    {
+        printf("Nenhum abastecimento cadastrado!\n");
+    }
+}
+
+float calcular_litros(Abastecimento abastecimento[], int total_abastecimento, int codigo)
+{
+    int i, contador;
+    float quantidade_litros = 0;
+    if (total_abastecimento > 0)
+    {
+        contador = 0;
+        for (i = 0; i < total_abastecimento; i++)
+        {
+            if (abastecimento[i].veiculo_codigo == codigo)
+            {
+                if (contador == 0)
+                {
+                    contador++;
+                }
+                else
+                {
+                    quantidade_litros += abastecimento[i].litros;
+                    contador++;
+                }
+            }
+        }
+    }
+    else
+    {
+        printf("Nenhum abastecimento cadastrado!\n");
+    }
+    return quantidade_litros;
+}
+
+float calcular_consumo_medio(Abastecimento abastecimento[], int total_abastecimento)
+{
+    int codigo, pos, contador;
+    float maior, menor, quantidade_litros, diferenca, media = 0;
+    if (total_abastecimento > 0)
+    {
+        codigo = ler_int("Digite o codigo do veiculo: ");
+        pos = localizar_veiculo(codigo);
+        if (pos != -1)
+        {
+            encontrar_maior_menor(abastecimento, total_abastecimento, &maior, &menor, &contador, codigo);
+            if (contador < 2)
+            {
+                printf("Nao e possivel calcular o consumo! Total de abastecimentos incorreto.\n");
+            }
+            else
+            {
+                quantidade_litros = calcular_litros(abastecimento, total_abastecimento, codigo);
+                diferenca = maior - menor;
+                if(quantidade_litros < 0)
+                {
+                    printf("Nao e possivel calcular o consumo! Quantidade de litros incorreto.\n");
+                }
+                media = diferenca / quantidade_litros;
+            }
+        }
+    }
+    else
+    {
+        printf("Nenhum abastecimento cadastrado!\n");
+    }
+    return media;
 }
 
 #endif
