@@ -329,7 +329,7 @@ void excluir_veiculos_fisica()
 }
 
 // exercicio 5 - outra parte esta em menu.h, linha 67 
-Veiculo retornar_veiculo_por_posicao(int posicao)
+Veiculo obter_veiculo_por_posicao(int posicao)
 {
     FILE *arq;
     Veiculo veiculo = {0};

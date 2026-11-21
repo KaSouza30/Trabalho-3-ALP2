@@ -72,7 +72,7 @@ void apresentar_lista_ativos(int total)
     printf("Lista de veiculos ativos: \n");
     for (i = 0; i < total; i++)
     {
-        veiculo = retornar_veiculo_por_posicao(i);
+        veiculo = obter_veiculo_por_posicao(i);
         if (veiculo.situacao == 1)
         {
             apresentar_dados_veiculo(veiculo);

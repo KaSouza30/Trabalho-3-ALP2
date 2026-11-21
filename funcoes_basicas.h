@@ -9,18 +9,18 @@
 #define TV 100
 #define TA 1000
 
-struct Veiculo
+typedef struct Veiculo
 {
     int codigo, ano;
     char placa[T], modelo[TC], situacao;
     float km_atual;
-};
+} Veiculo;
 
-struct Abastecimento
+typedef struct Abastecimento
 {
     int dia, mes, ano, veiculo_codigo;
     float litros, valor, km_abastecimento;
-};
+} Abastecimento;
 
 void limpar_enter(char vetor[])
 {
