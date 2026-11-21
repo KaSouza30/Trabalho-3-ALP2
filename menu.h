@@ -63,6 +63,23 @@ void alterar_todos(Veiculo veiculo[], int pos)
     veiculo[pos].ano = ler_int("Digite o ano: ");
 }
 
+// exercicio 5 - outra parte esta em manipulacao_arquivo.h, linha 331
+void apresentar_lista_ativos(int total)
+{
+    Veiculo veiculo;
+    int i;
+
+    printf("Lista de veiculos ativos: \n");
+    for (i = 0; i < total; i++)
+    {
+        veiculo = obter_veiculo_por_posicao(i);
+        if (veiculo.situacao == 1)
+        {
+            apresentar_dados_veiculo(veiculo);
+        }
+    }
+}
+
 // exercicio 6
 void validar_data(int *dia, int *mes, int *ano)
 {

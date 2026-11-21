@@ -9,18 +9,18 @@
 #define TV 100
 #define TA 1000
 
-struct Veiculo
+typedef struct Veiculo
 {
     int codigo, ano;
     char placa[T], modelo[TC], situacao;
     float km_atual;
-};
+} Veiculo;
 
-struct Abastecimento
+typedef struct Abastecimento
 {
     int dia, mes, ano, veiculo_codigo;
     float litros, valor, km_abastecimento;
-};
+} Abastecimento;
 
 void limpar_enter(char vetor[])
 {
@@ -123,11 +123,11 @@ void ler_placa(char placa[], int tamanho, int pos_ignorar)
 
 void apresentar_dados_veiculo(Veiculo veiculo)
 {
-    printf("Codigo: %d\n", veiculo.codigo);
-    printf("Placa: %s\n", veiculo.placa);
-    printf("Modelo: %s\n", veiculo.modelo);
-    printf("Ano: %d\n", veiculo.ano);
-    printf("Km atual: %.2f\n", veiculo.km_atual);
+    printf("Codigo: %d | ", veiculo.codigo);
+    printf("Placa: %s | ", veiculo.placa);
+    printf("Modelo: %s | ", veiculo.modelo);
+    printf("Ano: %d | ", veiculo.ano);
+    printf("Km atual: %.2f | ", veiculo.km_atual);
     if (veiculo.situacao == 1)
     {
         printf("Situacao: Ativo\n");
