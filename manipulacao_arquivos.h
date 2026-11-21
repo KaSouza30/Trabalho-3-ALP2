@@ -244,6 +244,24 @@ int sobreescrever_veiculo(int posicao, Veiculo veiculo)
 }
 
 // exercicio 3
+Veiculo pesquisar_veiculo (int codigo)
+{
+    FILE *arq;
+    Veiculo veiculo = {0};
+    arq = fopen("veiculos.dat", "rb");
+
+    if (arq == NULL)
+    {
+        printf("Nao foi possivel abrir o arquivo.\n");
+    } else 
+    {
+        while
+    }
+
+    return veiculo;
+}
+
+// exercicio 6
 int cadastrar_abastecimento(Abastecimento abastecimento, Veiculo veiculo, int total, int total_abastecimento)
 {
     int dia, mes, ano, codigo, pos;
@@ -346,7 +364,7 @@ int incluir_abastecimento(Abastecimento abastecimento)
     FILE *arq;
     int sucesso = 0;
 
-    arq = fopen("veiculos.dat", "ab");
+    arq = fopen("abastecimentos.dat", "ab");
     if (arq == NULL)
     {
         printf("Nao foi possivel abrir o arquivo para gravacao!\n");
