@@ -121,7 +121,7 @@ void ler_placa(char placa[], int tamanho, int pos_ignorar)
     } while (!valido);
 }
 
-void apresentar_dados_veiculo (Veiculo veiculo) 
+void apresentar_dados_veiculo(Veiculo veiculo)
 {
     printf("Codigo: %d\n", veiculo.codigo);
     printf("Placa: %s\n", veiculo.placa);
