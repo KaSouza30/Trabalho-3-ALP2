@@ -191,4 +191,101 @@ int incluir_abastecimento(Abastecimento abastecimento)
     return sucesso;
 }
 
+// exercicio 8
+void encontrar_maior_menor(Abastecimento abastecimento[], int total_abastecimento,
+                           float *maior, float *menor, int *contador, int codigo)
+{
+    int i;
+    *maior = 0;
+    *menor = -1;
+    *contador = 0;
+
+    if (total_abastecimento > 0)
+    {
+        for (i = 0; i < total_abastecimento; i++)
+        {
+            if (abastecimento[i].veiculo_codigo == codigo)
+            {
+                if (abastecimento[i].km_abastecimento > *maior)
+                {
+                    *maior = abastecimento[i].km_abastecimento;
+                }
+                if (abastecimento[i].km_abastecimento < *menor || *menor == -1)
+                {
+                    *menor = abastecimento[i].km_abastecimento;
+                }
+                (*contador)++;
+            }
+        }
+    }
+    else
+    {
+        printf("Nenhum abastecimento cadastrado!\n");
+    }
+}
+
+float calcular_litros(Abastecimento abastecimento[], int total_abastecimento, int codigo)
+{
+    int i, contador;
+    float quantidade_litros = 0;
+    if (total_abastecimento > 0)
+    {
+        contador = 0;
+        for (i = 0; i < total_abastecimento; i++)
+        {
+            if (abastecimento[i].veiculo_codigo == codigo)
+            {
+                if (contador == 0)
+                {
+                    contador++;
+                }
+                else
+                {
+                    quantidade_litros += abastecimento[i].litros;
+                    contador++;
+                }
+            }
+        }
+    }
+    else
+    {
+        printf("Nenhum abastecimento cadastrado!\n");
+    }
+    return quantidade_litros;
+}
+
+float calcular_consumo_medio(Abastecimento abastecimento[], int total_abastecimento)
+{
+    int codigo, pos, contador;
+    float maior, menor, quantidade_litros, diferenca, media = 0;
+    if (total_abastecimento > 0)
+    {
+        codigo = ler_int("Digite o codigo do veiculo: ");
+        pos = localizar_veiculo(codigo);
+        if (pos != -1)
+        {
+            encontrar_maior_menor(abastecimento, total_abastecimento, &maior, &menor, &contador, codigo);
+            if (contador < 2)
+            {
+                printf("Nao e possivel calcular o consumo! Total de abastecimentos incorreto.\n");
+            }
+            else
+            {
+                quantidade_litros = calcular_litros(abastecimento, total_abastecimento, codigo);
+                diferenca = maior - menor;
+                if(quantidade_litros < 0)
+                {
+                    printf("Nao e possivel calcular o consumo! Quantidade de litros incorreto.\n");
+                }
+                media = diferenca / quantidade_litros;
+            }
+        }
+    }
+    else
+    {
+        printf("Nenhum abastecimento cadastrado!\n");
+    }
+    return media;
+}
+
 #endif
