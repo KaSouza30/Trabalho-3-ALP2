@@ -73,7 +73,10 @@ void apresentar_lista_ativos(int total)
     for (i = 0; i < total; i++)
     {
         veiculo = retornar_veiculo_por_posicao(i);
-        apresentar_dados_veiculo(veiculo);
+        if (veiculo.situacao == 1)
+        {
+            apresentar_dados_veiculo(veiculo);
+        }
     }
 }
 
