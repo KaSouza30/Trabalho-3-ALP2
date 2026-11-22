@@ -434,4 +434,25 @@ void apresentar_veiculos_mais_menos_gastou(Abastecimento abastecimento[], int to
         }
     }
 }
+
+Abastecimento obter_abastecimento_por_posicao(int posicao)
+{
+    FILE *arq;
+    Abastecimento abastecimento = {0};
+    arq = fopen("abastecimento.dat", "rb");
+
+    if (arq == NULL)
+    {
+        printf("Nao foi possivel abrir o arquivo de abastecimentos.\n");
+    }
+    else
+    {
+        fseek(arq, posicao * sizeof(Abastecimento), SEEK_SET);
+        fread(&abastecimento, sizeof(Abastecimento), 1, arq);
+        fclose(arq);
+    }
+
+    return abastecimento;
+}
+
 #endif

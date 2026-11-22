@@ -81,45 +81,6 @@ void apresentar_lista_ativos(int total)
 }
 
 // exercicio 6
-void validar_data(int *dia, int *mes, int *ano)
-{
-    do
-    {
-        *dia = ler_int("Digite o dia da venda: ");
-        if (*dia <= 0 || *dia > 31)
-        {
-            printf("Dia invalido!\n");
-        }
-    } while (*dia <= 0 || *dia > 31);
-    do
-    {
-        *mes = ler_int("Digite o mes da venda: ");
-        if (*mes <= 0 || *mes > 12)
-        {
-            printf("Mes invalido!\n");
-        }
-        if (*mes == 2)
-        {
-            if (*dia > 28)
-            {
-                while (*dia > 28 || *dia < 1)
-                {
-                    printf("Dia invalido!\n");
-                    *dia = ler_int("Digite o dia da venda: ");
-                }
-            }
-        }
-    } while (*mes <= 0 || *mes > 12);
-    do
-    {
-        *ano = ler_int("Digite o ano da venda: ");
-        if (*ano <= 1999 || *ano > 2026)
-        {
-            printf("Ano invalido!\n");
-        }
-    } while (*ano <= 1999 || *ano > 2026);
-}
-
 int cadastrar_abastecimento(Abastecimento abastecimento[], Veiculo veiculo[], int total, int total_abastecimento)
 {
     int dia, mes, ano, codigo, pos;
@@ -129,7 +90,7 @@ int cadastrar_abastecimento(Abastecimento abastecimento[], Veiculo veiculo[], in
     {
         if (total_abastecimento < TA)
         {
-            validar_data(&dia, &mes, &ano);
+            ler_data(&dia, &mes, &ano);
             do
             {
                 codigo = ler_int("Digite um codigo: ");
@@ -183,7 +144,6 @@ int cadastrar_abastecimento(Abastecimento abastecimento[], Veiculo veiculo[], in
 }
 
 // exercicio 10
-
 int contar_abastecimentos(Abastecimento abastecimento[], int total_abastecimento, int codigo)
 {
     int i;
@@ -359,6 +319,93 @@ void encontrar_mais_menos_gastou(Abastecimento abastecimento[], int total_abaste
     else
     {
         printf("Nenhum abastecimento cadastrado!\n");
+    }
+}
+
+// exercicio 7
+void gerar_relatorio_abastecimentos(int total)
+{
+    Veiculo veiculo;
+    Abastecimento abastecimento;
+    char opcao = 'n';
+    int codigo, i, pos;
+    float total_litros = 0, valor_total_gasto = 0, valor_total = 0;
+
+    do
+    {
+        codigo = ler_int("Digite o codigo do veiculo: ");
+        pos = localizar_veiculo(codigo);
+        if (pos == -1)
+        {
+            printf("Codigo nao encontrado, deseja digitar novamente? (s - sim, n - nao): ");
+            scanf(" %c", &opcao);
+        }
+    } while (opcao == 's');
+
+    if (pos != -1)
+    {
+        veiculo = pesquisar_veiculo_por_codigo(codigo); // linha 144 no manipulacao_arquivos
+
+        printf("Relatorio de abastecimentos:\n");
+        for (i = 0; i < total; i++)
+        {
+            abastecimento = obter_abastecimento_por_posicao(i); // linha 438 no manipulacao_arquivos
+            if (veiculo.codigo == abastecimento.veiculo_codigo)
+            {
+                valor_total = abastecimento.litros * abastecimento.valor;
+                total_litros += abastecimento.litros;
+                valor_total_gasto += valor_total;
+                printf("%d/%d/%d | ", abastecimento.dia, abastecimento.mes, abastecimento.ano);
+                printf("%.2f L | ", abastecimento.litros);
+                printf("Valor do litro: %.2f | ", abastecimento.valor);
+                printf("Valor total: R$ %.2f | ", valor_total);
+                printf("Quilometragem: %.2f KM\n", abastecimento.km_abastecimento);
+            }
+        }
+        printf("\nTotal de litros: %.2f L\n", total_litros);
+        printf("Valor total gasto pelo veiculo: R$ %.2f\n", valor_total_gasto);
+    }
+}
+
+// exercicio 9
+void calcular_gasto_mensal(int total_abastecimentos, int *qtd_abastecimentos, 
+                            float *valor_total_gasto, float *total_litros)
+{
+    int mes, ano, i = 0;
+    Abastecimento abastecimento;
+
+    mes = ler_mes();
+    ano = ler_ano(2026);
+
+    do
+    {
+        abastecimento = obter_abastecimento_por_posicao(i);
+        if (abastecimento.mes == mes && abastecimento.ano == ano)
+        {
+            *valor_total_gasto += abastecimento.valor * abastecimento.litros;
+            *qtd_abastecimentos++;
+            *total_litros += abastecimento.litros;
+        }
+        i++;
+    } while (i < total_abastecimentos);
+}
+
+void apresentar_gasto_mensal (int tl)
+{
+    int qtd_abastecimentos;
+    float valor_total_gasto, total_litros;
+
+    calcular_gasto_mensal(tl, &qtd_abastecimentos, &valor_total_gasto, &total_litros);
+
+    if (qtd_abastecimentos > 0)
+    {
+        printf("Valor total gasto: R$ %.2f | ", valor_total_gasto);
+        printf("Quantidade de abastecimentos: %d | ", qtd_abastecimentos);
+        printf("Total de litros: %.2f L\n", total_litros);
+    } 
+    else 
+    {
+        printf("Nao houve abastecimento realizado neste periodo.\n");
     }
 }
 

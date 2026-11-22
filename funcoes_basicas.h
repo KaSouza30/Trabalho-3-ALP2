@@ -138,4 +138,62 @@ void apresentar_dados_veiculo(Veiculo veiculo)
     }
 }
 
+int ler_dia (int dia_maximo)
+{
+    int dia;
+    
+    printf("Digite um dia entre 1 e %d: ");
+    dia = ler_int("");
+    printf("\n");
+    while (dia < 1 || dia > dia_maximo)
+    {
+        printf("Digite um dia entre 1 e %d!!!\n", dia_maximo);
+        dia = ler_int("Digite: ");
+    }
+    
+    return dia;
+}
+
+int ler_mes ()
+{
+    int mes;
+
+    mes = ler_int("Digite o mes: ");
+    while (mes < 1 || mes > 12)
+    {
+        printf("Digite o mes entre 1 e 12!!!\n");
+        mes = ler_int("Digite: ");
+    }
+
+    return mes;
+}
+
+int ler_ano (int ano_atual)
+{
+    int ano;
+
+    ano = ler_int("Digite o ano: ");
+    while (ano < 2008 || ano > ano_atual) // escolhemos 2008 porque é o ano de fundação do campus (a gente acha)
+    {
+        printf("Digite o ano entre 2008 e %d!!!\n", ano_atual);
+        ano = ler_int("Digite: ");
+    }
+
+    return ano;
+}
+
+void ler_data(int *dia, int *mes, int *ano)
+{
+    *dia = ler_dia(31);
+
+    *mes = ler_mes();
+    if (*mes == 2 && *dia > 28)
+    {
+        *dia = ler_dia(28);
+    }
+    
+    *ano = ler_ano(2026);
+}
+
+
 #endif
