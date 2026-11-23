@@ -140,36 +140,6 @@ int sobreescrever_veiculo(int posicao, Veiculo veiculo)
     return sucesso;
 }
 
-// exercicio 3 - pesquisar_veiculo_por_codigo()
-Veiculo pesquisar_veiculo_por_codigo(int codigo)
-{
-    FILE *arq;
-    Veiculo veiculo = {0};
-    int posicao;
-    arq = fopen("veiculos.dat", "rb");
-
-    posicao = localizar_veiculo(codigo);
-    if (arq == NULL)
-    {
-        printf("Nao foi possivel abrir o arquivo de veiculos.\n");
-    }
-    else
-    {
-        if (posicao == -1)
-        {
-            printf("Veiculo nao encontrado!\n");
-        }
-        else
-        {
-            fseek(arq, posicao * sizeof(Veiculo), SEEK_SET);
-            fread(&veiculo, sizeof(Veiculo), 1, arq);
-            fclose(arq);
-        }
-    }
-
-    return veiculo;
-}
-
 // exercicio 4 - verificar_tem_abastecimentos(), excluir_veiculo_logica(), recuperar_veiculo()
 int verificar_tem_abastecimento(int codigo) 
 // passa por todos os registros ate achar um que tenha o codigo fornecido, se tiver retorna 1
@@ -200,7 +170,7 @@ int verificar_tem_abastecimento(int codigo)
 void excluir_veiculo_logica(int posicao)
 {
     Veiculo veiculo;
-    veiculo = pesquisar_veiculo_por_codigo(posicao);
+    veiculo = obter_veiculo_por_posicao(posicao);
     int sobreescreveu = 0, tem_abastecimento;
     if (veiculo.situacao == 1)
     {
@@ -232,7 +202,7 @@ void excluir_veiculo_logica(int posicao)
 void recuperar_veiculo(int posicao)
 {
     Veiculo veiculo;
-    veiculo = pesquisar_veiculo_por_codigo(posicao);
+    veiculo = obter_veiculo_por_posicao(posicao);
     int sobreescreveu = 0;
     if (veiculo.situacao == 0)
     {
@@ -328,7 +298,7 @@ void excluir_veiculos_fisica()
     }
 }
 
-// exercicio 5 - outra parte esta em menu.h, linha 67 
+// exercicio 5 - outra parte esta em menu.h, linha  
 Veiculo obter_veiculo_por_posicao(int posicao)
 {
     FILE *arq;

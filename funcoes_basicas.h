@@ -70,6 +70,33 @@ void ler_string(char mensagem[], char vetor[], int tamanho)
     limpar_enter(vetor);
 }
 
+Veiculo ler_dados_veiculo()
+{
+    Veiculo veiculo;
+    printf("Placa: ");
+    ler_placa(veiculo.placa, 7, -1);
+    ler_string("Modelo: ", veiculo.modelo, TC);
+    printf("Ano: ");
+    ler_ano(veiculo.ano);
+    ler_float("Km atual: ");
+    ler_int("Situacao: ");
+    getchar();
+    return veiculo;
+}
+
+Abastecimento ler_dados_abastecimento()
+{
+    Abastecimento abastecimento;
+    int dia, mes, ano;
+    printf("Dia: ");
+    ler_data(&dia, &mes, &ano);
+    ler_float("Litros: ");
+    ler_float("Valor litro: ");
+    ler_float("Km no abastecimento: ");
+    return abastecimento;
+}
+
+
 void ler_placa(char placa[], int tamanho, int pos_ignorar)
 {
     int valido, i, j = 0, pos_placa;
