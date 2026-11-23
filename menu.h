@@ -368,7 +368,7 @@ void gerar_relatorio_abastecimentos(int total)
 }
 
 // exercicio 9
-void calcular_gasto_mensal(int total_abastecimentos, int *qtd_abastecimentos, 
+void calcular_gasto_mensal(int tl_abastecimentos, int *qtd_abastecimentos, 
                             float *valor_total_gasto, float *total_litros)
 {
     int mes, ano, i = 0;
@@ -387,7 +387,7 @@ void calcular_gasto_mensal(int total_abastecimentos, int *qtd_abastecimentos,
             *total_litros += abastecimento.litros;
         }
         i++;
-    } while (i < total_abastecimentos);
+    } while (i < tl_abastecimentos);
 }
 
 void apresentar_gasto_mensal (int tl)
@@ -405,8 +405,56 @@ void apresentar_gasto_mensal (int tl)
     } 
     else 
     {
-        printf("Nao houve abastecimento realizado neste periodo.\n");
+        printf("Nao ha abastecimento deste periodo registrado.\n");
     }
+}
+
+// exercicio 12
+void calcular_ativos_inativos (int tl_veiculos, int *qtd_ativos, int *qtd_inativos)
+{
+    int i;
+    Veiculo veiculo;
+
+    for (i = 0; i < tl_veiculos; i++)
+    {
+        veiculo = obter_veiculo_por_posicao(i);
+        if (veiculo.situacao == 0)
+        {
+            (*qtd_inativos)++;
+        }
+    }
+
+    *qtd_ativos = tl_veiculos - *qtd_inativos;
+}
+
+float calcular_total_gasto_frota (int tl_abastecimentos)
+{
+    int i;
+    float total_gasto = 0;
+    Abastecimento abastecimento;
+
+    for (i = 0; i < tl_abastecimentos; i++)
+    {
+        abastecimento = obter_abastecimento_por_posicao(i);
+        total_gasto += abastecimento.valor * abastecimento.litros;
+    }
+
+    return total_gasto;
+}
+
+void apresentar_resumo_frota (int tl_veiculos, int tl_abastecimentos)
+{
+    int qtd_ativos, qtd_inativos;
+    float total_gasto;
+
+    calcular_ativos_inativos(tl_veiculos, &qtd_ativos, &qtd_inativos);
+    total_gasto = calcular_total_gasto_frota(tl_abastecimentos);
+
+    printf("Qtd de veiculos cadastrados: %d | ", tl_veiculos);
+    printf("Ativos: %d | ", qtd_ativos);
+    printf("Inativos: %d | \n", qtd_inativos);
+    printf("Qtd de abastecimentos registrados: %d | ", tl_abastecimentos);
+    printf("Total gasto pela frota: R$ %.2f\n", total_gasto);
 }
 
 #endif
