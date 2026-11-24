@@ -4,6 +4,7 @@
 #include "manipulacao_arquivos.h"
 #include <stdio.h>
 #include <string.h>
+#include <ctype.h>
 #define TC 100
 #define T 8
 #define TV 100
@@ -77,22 +78,18 @@ Veiculo ler_dados_veiculo()
     ler_placa(veiculo.placa, 7, -1);
     ler_string("Modelo: ", veiculo.modelo, TC);
     printf("Ano: ");
-    ler_ano(veiculo.ano);
-    ler_float("Km atual: ");
-    ler_int("Situacao: ");
-    getchar();
+    veiculo.ano = ler_ano(2026);
+    veiculo.km_atual = ler_float("Km atual: ");
     return veiculo;
 }
 
 Abastecimento ler_dados_abastecimento()
 {
     Abastecimento abastecimento;
-    int dia, mes, ano;
     printf("Dia: ");
-    ler_data(&dia, &mes, &ano);
-    ler_float("Litros: ");
-    ler_float("Valor litro: ");
-    ler_float("Km no abastecimento: ");
+    ler_data(&abastecimento.dia, &abastecimento.mes, &abastecimento.ano);
+    abastecimento.litros = ler_float("Litros: ");
+    abastecimento.valor = ler_float("Valor litro: ");
     return abastecimento;
 }
 
@@ -169,7 +166,7 @@ int ler_dia (int dia_maximo)
 {
     int dia;
     
-    printf("Digite um dia entre 1 e %d: ");
+    printf("Digite um dia entre 1 e %d: ", dia_maximo);
     dia = ler_int("");
     printf("\n");
     while (dia < 1 || dia > dia_maximo)

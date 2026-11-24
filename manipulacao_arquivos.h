@@ -141,7 +141,7 @@ int sobreescrever_veiculo(int posicao, Veiculo veiculo)
 }
 
 // exercicio 4 - verificar_tem_abastecimentos(), excluir_veiculo_logica(), recuperar_veiculo()
-int verificar_tem_abastecimento(int codigo) 
+int verificar_tem_abastecimento(int codigo)
 // passa por todos os registros ate achar um que tenha o codigo fornecido, se tiver retorna 1
 {
     FILE *arq;
@@ -298,7 +298,7 @@ void excluir_veiculos_fisica()
     }
 }
 
-// exercicio 5 - outra parte esta em menu.h, linha  
+// exercicio 5 - outra parte esta em menu.h, linha
 Veiculo obter_veiculo_por_posicao(int posicao)
 {
     FILE *arq;
@@ -320,23 +320,39 @@ Veiculo obter_veiculo_por_posicao(int posicao)
 }
 
 // exercicio 10
-void apresentar_veiculos_sem_abastecimento(Abastecimento abastecimento[], int total_abastecimento)
+int contar_abastecimentos(int codigo)
+{
+    FILE *arq;
+    int contador = 0;
+    Abastecimento abastecimento;
+    arq = fopen("abastecimentos.dat", "rb");
+    if (arq != NULL)
+    {
+        while (fread(&abastecimento, sizeof(Abastecimento), 1, arq) == 1)
+        {
+            if (abastecimento.veiculo_codigo == codigo)
+            {
+                contador++;
+            }
+        }
+        fclose(arq);
+    }
+    return contador;
+}
+
+void apresentar_veiculos_sem_abastecimento()
 {
     FILE *arq;
     Veiculo veiculo;
     int encontrou = 0, contador, ativos = 0;
     arq = fopen("veiculos.dat", "rb");
-    if (arq == NULL)
-    {
-        printf("Nao existe arquivo de veiculos!\n");
-    }
-    else
+    if (arq != NULL)
     {
         while (fread(&veiculo, sizeof(Veiculo), 1, arq) == 1)
         {
             if (veiculo.situacao == 1)
             {
-                contador = contar_abastecimentos(abastecimento, total_abastecimento, veiculo.codigo);
+                contador = contar_abastecimentos(veiculo.codigo);
                 if (contador == 0)
                 {
                     printf("Codigo: %d\n", veiculo.codigo);
@@ -347,61 +363,135 @@ void apresentar_veiculos_sem_abastecimento(Abastecimento abastecimento[], int to
                 ativos = 1;
             }
         }
+        fclose(arq);
+    }
 
-        if (encontrou == 0 && ativos == 1)
+    if (encontrou == 0 && ativos == 1)
+    {
+        printf("Todos os veiculos ja foram abastecidos!\n");
+    }
+    else if (ativos == 0)
+    {
+        printf("Nenhum veiculo ativo no momento!\n");
+    }
+}
+
+void encontrar_maior_menor(float *maior, float *menor, int codigo)
+{
+    FILE *arq;
+    Abastecimento abastecimento;
+    *maior = 0;
+    *menor = -1;
+    arq = fopen("abastecimentos.dat", "rb");
+    if (arq != NULL)
+    {
+        while (fread(&abastecimento, sizeof(Abastecimento), 1, arq) == 1)
         {
-            printf("Todos os veiculos ja foram abastecidos!\n");
-        }
-        else if (ativos == 0)
-        {
-            printf("Nenhum veiculo ativo no momento!\n");
+            if (abastecimento.veiculo_codigo == codigo)
+            {
+                if (abastecimento.km_abastecimento > *maior)
+                {
+                    *maior = abastecimento.km_abastecimento;
+                }
+                if (abastecimento.km_abastecimento < *menor || *menor == -1)
+                {
+                    *menor = abastecimento.km_abastecimento;
+                }
+            }
         }
         fclose(arq);
     }
 }
 
-// exercicio 11
-void apresentar_veiculos_mais_menos_gastou(Abastecimento abastecimento[], int total_abastecimento)
+// exercicio 8
+float calcular_litros(int codigo)
 {
     FILE *arq;
-    Veiculo veiculo;
-    float mais_gastou = -1;
-    float menos_gastou = -1;
-    int codigo_mais = -1;
-    int codigo_menos = -1;
-
-    arq = fopen("veiculos.dat", "rb");
-
-    if (arq == NULL)
+    int contador;
+    float quantidade_litros = 0;
+    Abastecimento abastecimento;
+    contador = 0;
+    arq = fopen("abastecimentos.dat", "rb");
+    if (arq != NULL)
     {
-        printf("Nao existe arquivo de veiculos!\n");
-    }
-    else
-    {
-        while (fread(&veiculo, sizeof(Veiculo), 1, arq) == 1)
+        while (fread(&abastecimento, sizeof(Abastecimento), 1, arq) == 1)
         {
-            encontrar_mais_menos_gastou(
-                abastecimento, total_abastecimento,
-                veiculo.codigo, &mais_gastou, &menos_gastou,
-                &codigo_mais, &codigo_menos);
+            if (abastecimento.veiculo_codigo == codigo)
+            {
+                if (contador == 0)
+                {
+                    contador++;
+                }
+                else
+                {
+                    quantidade_litros += abastecimento.litros;
+                    contador++;
+                }
+            }
         }
-
         fclose(arq);
+    }
+    return quantidade_litros;
+}
 
-        if (codigo_mais != -1)
+// exercicio 11
+float calcular_valor_abastecimentos(int codigo)
+{
+    FILE *arq;
+    Abastecimento abastecimento;
+    float valor_total = 0;
+    arq = fopen("abastecimentos.dat", "rb");
+    if (arq != NULL)
+    {
+        while (fread(&abastecimento, sizeof(Abastecimento), 1, arq) == 1)
         {
-            printf("\nVeiculo que mais gastou:\n");
-            printf("Codigo: %d\n", codigo_mais);
-            printf("Valor gasto: R$ %.2f\n", mais_gastou);
+            if (abastecimento.veiculo_codigo == codigo)
+            {
+                valor_total += abastecimento.valor * abastecimento.litros;
+            }
+        }
+        fclose(arq);
+    }
+    return valor_total;
+}
 
-            printf("\nVeiculo que menos gastou:\n");
-            printf("Codigo: %d\n", codigo_menos);
-            printf("Valor gasto: R$ %.2f\n", menos_gastou);
-        }
-        else
+void encontrar_mais_menos_gastou(float *mais_gastou, float *menos_gastou, int *codigo_mais, int *codigo_menos)
+{
+    FILE *arq_veiculo, *arq_abastecimento;
+    Abastecimento abastecimento;
+    Veiculo veiculo;
+    *mais_gastou = 0;
+    *menos_gastou = -1;
+    *codigo_mais = -1;
+    *codigo_menos = -1;
+    float valor_total;
+    arq_veiculo = fopen("veiculos.dat", "rb");
+    arq_abastecimento = fopen("abastecimentos.dat", "rb");
+    if (arq_veiculo != NULL && arq_abastecimento != NULL)
+    {
+        while (fread(&veiculo, sizeof(Veiculo), 1, arq_veiculo) == 1)
         {
-            printf("Nenhum abastecimento cadastrado!\n");
+            valor_total = calcular_valor_abastecimentos(veiculo.codigo);
+            rewind(arq_abastecimento);
+            while (fread(&abastecimento, sizeof(Abastecimento), 1, arq_abastecimento) == 1)
+            {
+                if (abastecimento.veiculo_codigo == veiculo.codigo)
+                {
+                    if (valor_total > *mais_gastou)
+                    {
+                        *mais_gastou = valor_total;
+                        *codigo_mais = veiculo.codigo;
+                    }
+                    if (valor_total < *menos_gastou || *menos_gastou == -1)
+                    {
+                        *menos_gastou = valor_total;
+                        *codigo_menos = veiculo.codigo;
+                    }
+                }
+            }
         }
+        fclose(arq_veiculo);
+        fclose(arq_abastecimento);
     }
 }
 
@@ -409,7 +499,7 @@ Abastecimento obter_abastecimento_por_posicao(int posicao)
 {
     FILE *arq;
     Abastecimento abastecimento = {0};
-    arq = fopen("abastecimento.dat", "rb");
+    arq = fopen("abastecimentos.dat", "rb");
 
     if (arq == NULL)
     {
