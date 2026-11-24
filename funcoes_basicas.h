@@ -160,6 +160,7 @@ void apresentar_dados_veiculo(Veiculo veiculo)
     {
         printf("Situacao: Inativo\n");
     }
+    printf("\n");
 }
 
 int ler_dia (int dia_maximo)

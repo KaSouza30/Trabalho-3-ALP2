@@ -21,10 +21,10 @@ int main()
                 pesquisar_veiculo();
                 break;
             case 4:
-                //
+                excluir_recuperar_veiculo();
                 break;
             case 5:
-                //
+                apresentar_lista_ativos();
                 break;
             case 6:
                 cadastrar_abastecimento();

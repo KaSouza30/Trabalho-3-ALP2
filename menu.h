@@ -91,23 +91,6 @@ void pesquisar_veiculo()
     }
 }
 
-// exercicio 5 - outra parte esta em manipulacao_arquivo.h, linha 331
-void apresentar_lista_ativos(int total)
-{
-    Veiculo veiculo;
-    int i;
-
-    printf("Lista de veiculos ativos: \n");
-    for (i = 0; i < total; i++)
-    {
-        veiculo = obter_veiculo_por_posicao(i);
-        if (veiculo.situacao == 1)
-        {
-            apresentar_dados_veiculo(veiculo);
-        }
-    }
-}
-
 // exercicio 6
 void cadastrar_abastecimento()
 {
@@ -430,6 +413,48 @@ void atualizar_veiculo()
     else
     {
         printf("Veiculo nao encontrado!\n");
+    }
+}
+
+// exercicio 4
+int submenu_excluir_recuperar()
+{
+    int op;
+    do
+    {
+        printf("Opcoes disponiveis:\n");
+        printf("1 - Excluir logicamente.\n");
+        printf("2 - Excluir veiculos inativos fisicamente.\n");
+        printf("3 - Recuperar veiculo inativo.\n");
+        printf("Opcao: ");
+        scanf("%d", &op);
+        getchar();
+    } while (op < 1 || op > 3);
+    return op;
+}
+
+void excluir_recuperar_veiculo()
+{
+    int codigo, opcao, pos;
+    printf("Exclusao ou recuperacao de veiculo: \n\n");
+    codigo = ler_int("Digite o codigo do veiculo: ");
+    pos = localizar_veiculo(codigo);
+
+    opcao = submenu_excluir_recuperar();
+    switch (opcao)
+    {
+    case 1:
+        excluir_veiculo_logica(pos);
+        break;
+    case 2:
+        excluir_veiculos_fisica();
+        break;
+    case 3:
+        recuperar_veiculo(pos);
+        break;
+    default:
+        printf("Erro ao excluir ou recuperar.");
+        break;
     }
 }
 

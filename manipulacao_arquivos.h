@@ -298,7 +298,33 @@ void excluir_veiculos_fisica()
     }
 }
 
-// exercicio 5 - outra parte esta em menu.h, linha
+// exercicio 5 - outra parte esta em manipulacao_arquivo.h
+void apresentar_lista_ativos()
+{
+    FILE *arq;
+    Veiculo veiculo;
+    int i;
+
+    arq = fopen("veiculos.dat", "rb");
+    printf("Lista de veiculos ativos: \n");
+
+    if (arq == NULL)
+    {
+        printf("Falha ao abrir o arquivo de veiculos.\n");
+    }
+    else
+    {
+        while (fread(&veiculo, sizeof(Veiculo), 1, arq))
+        {
+            veiculo = obter_veiculo_por_posicao(i);
+            if (veiculo.situacao == 1)
+            {
+                apresentar_dados_veiculo(veiculo);
+            }
+        }
+    }
+}
+
 Veiculo obter_veiculo_por_posicao(int posicao)
 {
     FILE *arq;
@@ -307,7 +333,7 @@ Veiculo obter_veiculo_por_posicao(int posicao)
 
     if (arq == NULL)
     {
-        printf("Nao foi possivel abrir o arquivo de veiculos.\n");
+        printf("Falha ao abrir o arquivo de veiculos.\n");
     }
     else
     {
