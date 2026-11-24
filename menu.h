@@ -7,12 +7,78 @@ Gustavo: exercicios 3, 4, 5, 7, 9 e 12*/
 
 #include "manipulacao_arquivos.h"
 #include "funcoes_basicas.h"
+#include "ctype.h"
+
+void ler_placa(char placa[], int tamanho, int codigo_ignorar)
+{
+    int valido, i, j = 0, pos_placa;
+    do
+    {
+        valido = 1;
+        ler_string("Digite a placa: ", placa, tamanho);
+        j = 0;
+        while (placa[j] != '\0')
+        {
+            placa[j] = toupper(placa[j]);
+            j++;
+        }
+        if (strlen(placa) != 7)
+        {
+            printf("erro 1\n");
+            valido = 0;
+        }
+        else
+        {
+            for (i = 0; i < 7; i++)
+            {
+                if (i == 0 || i == 1 || i == 2 || i == 4)
+                {
+                    if (placa[i] < 'A' || placa[i] > 'Z')
+                    {
+                        printf("erro 2\n");
+                        valido = 0;
+                    }
+                }
+                else
+                {
+                    if (placa[i] < '0' || placa[i] > '9')
+                    {
+                        printf("erro 3\n");
+                        valido = 0;
+                    }
+                }
+            }
+            pos_placa = localizar_placa(placa, codigo_ignorar);
+            if (pos_placa != -1)
+            {
+                valido = 0;
+                printf("Placa ja cadastrada!\n");
+            }
+        }
+
+        if (!valido)
+        {
+            printf("Placa invalida!\n");
+        }
+    } while (!valido);
+}
+
+Veiculo ler_dados_veiculo()
+{
+    Veiculo veiculo;
+    ler_placa(veiculo.placa, 8, -1);
+    getchar();
+    ler_string("Modelo: ", veiculo.modelo, TC);
+    veiculo.ano = ler_ano(2026);
+    veiculo.km_atual = ler_float("Km atual: ");
+    return veiculo;
+}
 
 // exercicio 1
 void cadastrar_veiculo()
 {
     Veiculo veiculo;
-    int codigo, pos_veiculo;
+    int pos_veiculo, codigo;
     do
     {
         codigo = ler_int("Digite o codigo: ");
@@ -35,7 +101,7 @@ void alterar_placa(int pos)
 {
     Veiculo veiculo;
     veiculo = obter_veiculo_por_posicao(pos);
-    ler_placa(veiculo.placa, 7, veiculo.codigo);
+    ler_placa(veiculo.placa, 8, veiculo.codigo);
     sobreescrever_veiculo(pos, veiculo);
 }
 
@@ -59,7 +125,7 @@ void alterar_todos(int pos)
 {
     Veiculo veiculo;
     veiculo = obter_veiculo_por_posicao(pos);
-    ler_placa(veiculo.placa, 7, veiculo.codigo);
+    ler_placa(veiculo.placa, 8, veiculo.codigo);
     ler_string("Digite o modelo: ", veiculo.modelo, TC);
     veiculo.ano = ler_ano(2026);
     sobreescrever_veiculo(pos, veiculo);
@@ -69,10 +135,9 @@ void alterar_todos(int pos)
 void pesquisar_veiculo()
 {
     Veiculo veiculo;
-    int posicao, codigo;
+    int posicao;
 
-    codigo = ler_int("Digite o codigo: ");
-    posicao = localizar_veiculo(codigo);
+    posicao = obter_posicao_veiculo();
     if (posicao == -1)
     {
         printf("Veiculo nao encontrado.\n");
@@ -89,6 +154,16 @@ void pesquisar_veiculo()
             printf("Veiculo esta inativo.\n");
         }
     }
+}
+
+Abastecimento ler_dados_abastecimento()
+{
+    Abastecimento abastecimento;
+    printf("Dia: ");
+    ler_data(&abastecimento.dia, &abastecimento.mes, &abastecimento.ano);
+    abastecimento.litros = ler_float("Litros: ");
+    abastecimento.valor = ler_float("Valor litro: ");
+    return abastecimento;
 }
 
 // exercicio 6
@@ -201,79 +276,12 @@ void apresentar_veiculos_mais_menos_gastou()
     }
 }
 
-// exercicio 7
-void apresentar_relatorio_abastecimentos(int total)
-{
-    Veiculo veiculo;
-    Abastecimento abastecimento;
-    char opcao = 'n';
-    int codigo, i, pos;
-    float *total_litros = 0, *valor_total_gasto = 0, *valor_total = 0;
-
-    do
-    {
-        codigo = ler_int("Digite o codigo do veiculo: ");
-        pos = localizar_veiculo(codigo);
-        if (pos == -1)
-        {
-            printf("Codigo nao encontrado, deseja digitar novamente? (s - sim, n - nao): ");
-            scanf(" %c", &opcao);
-        }
-    } while (opcao == 's');
-
-    if (pos != -1)
-    {
-        veiculo = obter_veiculo_por_posicao(pos); // linha 144 no manipulacao_arquivos
-
-        printf("Relatorio de abastecimentos:\n");
-        for (i = 0; i < total; i++)
-        {
-            abastecimento = obter_abastecimento_por_posicao(i); // linha 438 no manipulacao_arquivos
-            if (veiculo.codigo == abastecimento.veiculo_codigo)
-            {
-                calcular_relatorio_abastecimentos(abastecimento, total, &valor_total, &total_litros, &valor_total_gasto);
-                printf("%d/%d/%d | ", abastecimento.dia, abastecimento.mes, abastecimento.ano);
-                printf("%.2f L | ", abastecimento.litros);
-                printf("Valor do litro: %.2f | ", abastecimento.valor);
-                printf("Valor total: R$ %.2f | ", valor_total);
-                printf("Quilometragem: %.2f KM\n", abastecimento.km_abastecimento);
-            }
-        }
-
-        printf("\nTotal de litros: %.2f L\n", total_litros);
-        printf("Valor total gasto pelo veiculo: R$ %.2f\n", valor_total_gasto);
-    }
-}
-
-// exercicio 9
-void calcular_gasto_mensal(int tl_abastecimentos, int *qtd_abastecimentos,
-                           float *valor_total_gasto, float *total_litros)
-{
-    int mes, ano, i = 0;
-    Abastecimento abastecimento;
-
-    mes = ler_mes();
-    ano = ler_ano(2026);
-
-    do
-    {
-        abastecimento = obter_abastecimento_por_posicao(i);
-        if (abastecimento.mes == mes && abastecimento.ano == ano)
-        {
-            *valor_total_gasto += abastecimento.valor * abastecimento.litros;
-            *qtd_abastecimentos++;
-            *total_litros += abastecimento.litros;
-        }
-        i++;
-    } while (i < tl_abastecimentos);
-}
-
-void apresentar_gasto_mensal(int tl)
+void apresentar_gasto_mensal()
 {
     int qtd_abastecimentos;
     float valor_total_gasto, total_litros;
 
-    calcular_gasto_mensal(tl, &qtd_abastecimentos, &valor_total_gasto, &total_litros);
+    calcular_gasto_mensal(&qtd_abastecimentos, &valor_total_gasto, &total_litros);
 
     if (qtd_abastecimentos > 0)
     {
@@ -287,51 +295,20 @@ void apresentar_gasto_mensal(int tl)
     }
 }
 
-// exercicio 12
-void calcular_ativos_inativos(int tl_veiculos, int *qtd_ativos, int *qtd_inativos)
+// exercicio 12 - calcular_ativos_inativos(), calcular_total_gasto_frota(), apresentar_resumo_frota()
+void apresentar_resumo_frota()
 {
-    int i;
-    Veiculo veiculo;
-
-    for (i = 0; i < tl_veiculos; i++)
-    {
-        veiculo = obter_veiculo_por_posicao(i);
-        if (veiculo.situacao == 0)
-        {
-            (*qtd_inativos)++;
-        }
-    }
-
-    *qtd_ativos = tl_veiculos - *qtd_inativos;
-}
-
-float calcular_total_gasto_frota(int tl_abastecimentos)
-{
-    int i;
-    float total_gasto = 0;
-    Abastecimento abastecimento;
-
-    for (i = 0; i < tl_abastecimentos; i++)
-    {
-        abastecimento = obter_abastecimento_por_posicao(i);
-        total_gasto += abastecimento.valor * abastecimento.litros;
-    }
-
-    return total_gasto;
-}
-
-void apresentar_resumo_frota(int tl_veiculos, int tl_abastecimentos)
-{
-    int qtd_ativos, qtd_inativos;
+    int qtd_ativos, qtd_inativos, qtd_veiculos_cadastrados, qtd_abastecimentos_registrados;
     float total_gasto;
 
-    calcular_ativos_inativos(tl_veiculos, &qtd_ativos, &qtd_inativos);
-    total_gasto = calcular_total_gasto_frota(tl_abastecimentos);
+    qtd_veiculos_cadastrados = calcular_ativos_inativos(&qtd_ativos, &qtd_inativos);
+    total_gasto = calcular_total_gasto_frota();
+    qtd_abastecimentos_registrados = retornar_quant_abasts();
 
-    printf("Qtd de veiculos cadastrados: %d | ", tl_veiculos);
+    printf("Qtd de veiculos cadastrados: %d | ", qtd_veiculos_cadastrados);
     printf("Ativos: %d | ", qtd_ativos);
     printf("Inativos: %d | \n", qtd_inativos);
-    printf("Qtd de abastecimentos registrados: %d | ", tl_abastecimentos);
+    printf("Qtd de abastecimentos registrados: %d | ", qtd_abastecimentos_registrados);
     printf("Total gasto pela frota: R$ %.2f\n", total_gasto);
 }
 
@@ -440,21 +417,28 @@ void excluir_recuperar_veiculo()
     codigo = ler_int("Digite o codigo do veiculo: ");
     pos = localizar_veiculo(codigo);
 
-    opcao = submenu_excluir_recuperar();
-    switch (opcao)
+    if (pos != -1)
     {
-    case 1:
-        excluir_veiculo_logica(pos);
-        break;
-    case 2:
-        excluir_veiculos_fisica();
-        break;
-    case 3:
-        recuperar_veiculo(pos);
-        break;
-    default:
-        printf("Erro ao excluir ou recuperar.");
-        break;
+        opcao = submenu_excluir_recuperar();
+        switch (opcao)
+        {
+        case 1:
+            excluir_veiculo_logica(pos);
+            break;
+        case 2:
+            excluir_veiculos_fisica();
+            break;
+        case 3:
+            recuperar_veiculo(pos);
+            break;
+        default:
+            printf("Erro ao excluir ou recuperar.");
+            break;
+        }
+    }
+    else
+    {
+        printf("Veiculo inexistente.\n");
     }
 }
 

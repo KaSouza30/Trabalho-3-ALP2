@@ -2,9 +2,54 @@
 #ifndef MANIPULACAO_ARQUIVOS_H
 #define MANIPULACAO_ARQUIVOS_H
 #include "funcoes_basicas.h"
-#include "menu.h"
 #include <string.h>
 #include <ctype.h>
+
+void inicializar_arquivo()
+{
+    FILE *arq_veiculos;
+    FILE *arq_abastecimentos;
+
+    arq_veiculos = fopen("veiculos.dat", "rb");
+    arq_abastecimentos = fopen("abastecimentos.dat", "rb");
+
+    Veiculo veiculo[5] = {
+        {1, "ABC1D23", "Fiat Uno", 2018, 45200, 1},
+        {2, "DEF4G56", "Volkswagen Gol", 2020, 31800, 1},
+        {3, "HIJ7K89", "Ford Ka", 2017, 78350, 0},
+        {4, "LMN0P12", "Renault Kwid", 2022, 12400, 1},
+        {5, "QRS3T45", "Chevrolet Onix", 2021, 27900, 1}};
+
+    Abastecimento abastecimento[6] = {
+        {5, 9, 2026, 1, 38.5, 5.89, 44100},
+        {12, 9, 2026, 2, 42.0, 5.95, 30900},
+        {18, 9, 2026, 1, 40.2, 5.89, 45200},
+        {20, 9, 2026, 4, 30.0, 6.05, 11850},
+        {3, 10, 2026, 2, 44.5, 6.10, 31800},
+        {9, 10, 2026, 5, 36.8, 5.99, 27900}};
+
+    if (arq_veiculos == NULL)
+    {
+        arq_veiculos = fopen("veiculos.dat", "wb");
+        if (arq_veiculos != NULL)
+        {
+            fwrite(veiculo, sizeof(Veiculo), 5, arq_veiculos);
+            fclose(arq_veiculos);
+        }
+    }
+
+    if (arq_abastecimentos == NULL)
+    {
+        arq_abastecimentos = fopen("abastecimentos.dat", "wb");
+        if (arq_abastecimentos != NULL)
+        {
+            fwrite(abastecimento, sizeof(Abastecimento), 6, arq_abastecimentos);
+            fclose(arq_abastecimentos);
+        }
+    }
+    fclose(arq_veiculos);
+    fclose(arq_abastecimentos);
+}
 
 int localizar_veiculo(int codigo)
 {
@@ -162,9 +207,30 @@ int verificar_tem_abastecimento(int codigo)
                 tem_abastecimento = 1;
             }
         }
+        fclose(arq);
     }
 
     return tem_abastecimento;
+}
+
+Veiculo obter_veiculo_por_posicao(int posicao)
+{
+    FILE *arq;
+    Veiculo veiculo = {0};
+    arq = fopen("veiculos.dat", "rb");
+
+    if (arq == NULL)
+    {
+        printf("Falha ao abrir o arquivo de veiculos.\n");
+    }
+    else
+    {
+        fseek(arq, posicao * sizeof(Veiculo), SEEK_SET);
+        fread(&veiculo, sizeof(Veiculo), 1, arq);
+        fclose(arq);
+    }
+
+    return veiculo;
 }
 
 void excluir_veiculo_logica(int posicao)
@@ -303,7 +369,6 @@ void apresentar_lista_ativos()
 {
     FILE *arq;
     Veiculo veiculo;
-    int i;
 
     arq = fopen("veiculos.dat", "rb");
     printf("Lista de veiculos ativos: \n");
@@ -316,33 +381,13 @@ void apresentar_lista_ativos()
     {
         while (fread(&veiculo, sizeof(Veiculo), 1, arq))
         {
-            veiculo = obter_veiculo_por_posicao(i);
             if (veiculo.situacao == 1)
             {
                 apresentar_dados_veiculo(veiculo);
             }
         }
-    }
-}
-
-Veiculo obter_veiculo_por_posicao(int posicao)
-{
-    FILE *arq;
-    Veiculo veiculo = {0};
-    arq = fopen("veiculos.dat", "rb");
-
-    if (arq == NULL)
-    {
-        printf("Falha ao abrir o arquivo de veiculos.\n");
-    }
-    else
-    {
-        fseek(arq, posicao * sizeof(Veiculo), SEEK_SET);
-        fread(&veiculo, sizeof(Veiculo), 1, arq);
         fclose(arq);
     }
-
-    return veiculo;
 }
 
 // exercicio 10
@@ -429,7 +474,26 @@ void encontrar_maior_menor(float *maior, float *menor, int codigo)
     }
 }
 
-// exercicio 8
+float calcular_valor_abastecimentos(int codigo)
+{
+    FILE *arq;
+    Abastecimento abastecimento;
+    float valor_total = 0;
+    arq = fopen("abastecimentos.dat", "rb");
+    if (arq != NULL)
+    {
+        while (fread(&abastecimento, sizeof(Abastecimento), 1, arq) == 1)
+        {
+            if (abastecimento.veiculo_codigo == codigo)
+            {
+                valor_total += abastecimento.valor * abastecimento.litros;
+            }
+        }
+        fclose(arq);
+    }
+    return valor_total;
+}
+
 float calcular_litros(int codigo)
 {
     FILE *arq;
@@ -460,8 +524,8 @@ float calcular_litros(int codigo)
     return quantidade_litros;
 }
 
-// exercicio 11
-float calcular_valor_abastecimentos(int codigo)
+// exercicio 7
+float calcular_cada_abastecimento(int pos)
 {
     FILE *arq;
     Abastecimento abastecimento;
@@ -469,17 +533,116 @@ float calcular_valor_abastecimentos(int codigo)
     arq = fopen("abastecimentos.dat", "rb");
     if (arq != NULL)
     {
-        while (fread(&abastecimento, sizeof(Abastecimento), 1, arq) == 1)
-        {
-            if (abastecimento.veiculo_codigo == codigo)
-            {
-                valor_total += abastecimento.valor * abastecimento.litros;
-            }
-        }
+        fseek(arq, pos * sizeof(Abastecimento), SEEK_SET);
+        fread(&abastecimento, sizeof(Abastecimento), 1, arq);
+        valor_total += abastecimento.valor * abastecimento.litros;
         fclose(arq);
     }
     return valor_total;
 }
+
+int obter_posicao_veiculo()
+{
+    char opcao = 'n';
+    int codigo, pos;
+
+    do
+    {
+        codigo = ler_int("Digite o codigo do veiculo: ");
+        pos = localizar_veiculo(codigo);
+        if (pos == -1)
+        {
+            printf("Codigo nao encontrado, deseja digitar novamente? (s - sim, n - nao): ");
+            scanf(" %c", &opcao);
+        }
+    } while (opcao == 's');
+
+    return pos;
+}
+
+void apresentar_relatorio_abastecimentos()
+{
+    FILE *arq;
+    Veiculo veiculo;
+    Abastecimento abastecimento;
+    int pos, i = 0;
+    float total_litros = 0, valor_total_gasto = 0, valor_total = 0;
+
+    pos = obter_posicao_veiculo();
+
+    arq = fopen("abastecimentos.dat", "rb");
+
+    if (arq == NULL)
+    {
+        printf("Falha ao abrir o arquivo de abastecimentos.\n");
+    }
+    else
+    {
+        if (pos != -1)
+        {
+            veiculo = obter_veiculo_por_posicao(pos); // linha 144 no manipulacao_arquivos
+
+            printf("Relatorio de abastecimentos:\n");
+            while (fread(&abastecimento, sizeof(Abastecimento), 1, arq) == 1)
+            {
+                if (veiculo.codigo == abastecimento.veiculo_codigo)
+                {
+                    valor_total = calcular_cada_abastecimento(i);
+                    printf("%d/%d/%d | ", abastecimento.dia, abastecimento.mes, abastecimento.ano);
+                    printf("%.2f L | ", abastecimento.litros);
+                    printf("Valor do litro: %.2f | ", abastecimento.valor);
+                    printf("Valor total: R$ %.2f | ", valor_total);
+                    printf("Quilometragem: %.2f KM\n", abastecimento.km_abastecimento);
+                }
+                i++;
+            }
+
+            total_litros = calcular_litros(veiculo.codigo);
+            valor_total_gasto = calcular_valor_abastecimentos(veiculo.codigo);
+
+            printf("\nTotal de litros: %.2f L\n", total_litros);
+            printf("Valor total gasto pelo veiculo: R$ %.2f\n", valor_total_gasto);
+        }
+        fclose(arq);
+    }
+}
+
+// exercicio 8
+
+// exercicio 9
+void calcular_gasto_mensal(int *qtd_abastecimentos, float *valor_total_gasto, float *total_litros)
+{
+    FILE *arq;
+    int mes, ano;
+    Abastecimento abastecimento;
+    *qtd_abastecimentos = 0;
+    *valor_total_gasto = 0;
+    *total_litros = 0;
+
+    mes = ler_mes();
+    ano = ler_ano(2026);
+
+    arq = fopen("abastecimentos.dat", "rb");
+    if (arq == NULL)
+    {
+        printf("Nao foi possivel abrir o arquivo de abastecimentos.\n");
+    }
+    else
+    {
+        while (fread(&abastecimento, sizeof(Abastecimento), 1, arq) == 1)
+        {
+            if (abastecimento.mes == mes && abastecimento.ano == ano)
+            {
+                *valor_total_gasto += abastecimento.valor * abastecimento.litros;
+                (*qtd_abastecimentos)++;
+                *total_litros += abastecimento.litros;
+            }
+        }
+        fclose(arq);
+    }
+}
+
+// exercicio 11
 
 void encontrar_mais_menos_gastou(float *mais_gastou, float *menos_gastou, int *codigo_mais, int *codigo_menos)
 {
@@ -539,6 +702,73 @@ Abastecimento obter_abastecimento_por_posicao(int posicao)
     }
 
     return abastecimento;
+}
+
+// exercicio 12
+int calcular_ativos_inativos(int *qtd_ativos, int *qtd_inativos)
+{
+    FILE *arq;
+    int i = 0;
+    Veiculo veiculo;
+    *qtd_ativos = 0;
+    *qtd_inativos = 0;
+
+    arq = fopen("veiculos.dat", "rb");
+
+    if (arq == NULL)
+    {
+        printf("Falha ao abrir o arquivo de veiculos.\n");
+    }
+    while (fread(&veiculo, sizeof(Veiculo), 1, arq) == 1)
+    {
+        if (veiculo.situacao == 0)
+        {
+            (*qtd_inativos)++;
+        }
+        i++;
+    }
+    fclose(arq);
+
+    *qtd_ativos = i - *qtd_inativos;
+    return i; // total de veiculos
+}
+
+float calcular_total_gasto_frota()
+{
+    FILE *arq;
+    float total_gasto = 0;
+    Abastecimento abastecimento;
+
+    arq = fopen("abastecimentos.dat", "rb");
+
+    if (arq == NULL)
+    {
+        printf("Falha ao abrir o arquivo de abastecimentos.\n");
+    }
+    else
+    {
+        while (fread(&abastecimento, sizeof(Abastecimento), 1, arq) == 1)
+        {
+            total_gasto += abastecimento.valor * abastecimento.litros;
+        }
+        fclose(arq);
+    }
+
+    return total_gasto;
+}
+
+int retornar_quant_abasts()
+{
+    FILE *arq;
+    int quantidade = 0;
+    arq = fopen("abastecimentos.dat", "rb");
+    if (arq != NULL)
+    {
+        fseek(arq, 0, SEEK_END);
+        quantidade = ftell(arq) / sizeof(Abastecimento);
+        fclose(arq);
+    }
+    return quantidade;
 }
 
 #endif
